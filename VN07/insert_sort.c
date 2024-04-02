@@ -1,14 +1,37 @@
-// how to insert an element inside a linked list in such a way that it keeps liked list sorted.
-
 #include <stdio.h>
 #include <stdlib.h>
 
 typedef struct s_list
 {
 	int x;
-	struct s_list *next;
-	
-}			   t_list;
+	struct s_list* next;
+} t_list;
+
+void deallocate(t_list** root)
+{
+	t_list* curr = *root;
+
+	while (curr)
+	{
+		t_list* aux = curr;
+		curr = curr->next;
+		free(aux);
+	}
+	*root = NULL;
+}
+
+void insert_beginning(t_list** root, int value)
+{
+	t_list* new_node = malloc(sizeof(t_list));
+	if (!(new_node))
+		exit(1);
+	new_node->next = *root;
+	//Currect created node will point to the privious node
+	new_node->x = value;
+
+	*root = new_node;
+	//our root becomes new node
+}
 
 void insert_end(t_list** root, int value)
 {
@@ -29,67 +52,55 @@ void insert_end(t_list** root, int value)
 	curr->next = new_node;
 }
 
-void insert_after(t_list* root, int value)
+void add_after(t_list* root, int value)
 {
-	t_list* new_node = malloc(sizeof(t_list));
-
+	t_list *new_node = malloc(sizeof(t_list));
 	new_node->next = root->next;
 	new_node->x = value;
 
 	root->next = new_node;
 }
 
-void insert_beginning(t_list** root, int value)
+void sort_insert(t_list** root, int value)
 {
-	t_list* new_node = malloc(sizeof(t_list));
-
-	new_node->next = *root;
-	new_node->x = value;
-
-	*root = new_node;
-}
-
-void insert_sorted(t_list** root, int value)
-{
-	if (*root == NULL || (**root).x	>= value)
+	if (*root == NULL || (**root).x >= value)
 	{
 		insert_beginning(root, value);
-		return;
+		return ;
 	}
-
+	
 	t_list* curr = *root;
 	while (curr->next)
 	{
 		if (curr->next->x >= value)
 		{
-			insert_after(curr, value);
+			add_after(curr, value);
 			return ;
 		}
 		curr = curr->next;
 	}
-	insert_after(curr, value);
+	add_after(curr, value);
 }
 
-int main(void)
+int main(int argc, char const *argv[])
 {
-    t_list* root = NULL;
+	t_list* root = malloc(sizeof(t_list));
+	root->next = NULL;
+	root->x = 23;
 
-    insert_end(&root, 1);
-    insert_end(&root, 9);
-    insert_end(&root, 8);
+	insert_end(&root, -98);
+	insert_end(&root, 24);
+	insert_end(&root, 3);
+	insert_end(&root, 89);
 
-	insert_sorted(&root, 10);
+	sort_insert(&root, 99);
 
-    t_list* curr = root;
-    while (curr)
-    {
-        printf("%d", curr->x);
-        curr = curr->next;
-        if (curr)  // Check if curr is not NULL before accessing its members
-            printf(" ");
-    }
-
-    return 0;
+	t_list* curr = root;
+	while (curr)
+	{
+		printf("%d\n", curr->x);
+		curr = curr->next;
+	}
+	deallocate(&root);
+	return 0;
 }
-
-

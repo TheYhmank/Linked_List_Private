@@ -1,63 +1,94 @@
-// how to sort your linked list from the min to max
-// for instance: 2 0 3 5 4 1 -----> 0 1 2 3 4 5
-
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct s_type
+typedef struct s_list
 {
 	int x;
-	struct s_type* next;
-} t_type;
+	struct s_list* next;
+} t_list;
 
-void insert_end(t_type** root, int value)
+void insert_end(t_list** root, int value)
 {
-	t_type* new_node = malloc(sizeof(t_type));
-	if (!new_node)
-		exit(1);
+	t_list* new_node = malloc(sizeof(t_list));
+
 	new_node->next = NULL;
 	new_node->x = value;
 
 	if (*root == NULL)
 	{
 		*root = new_node;
-		return;
+		return ;
 	}
-	t_type* curr = *root;
+	
+	t_list* curr = *root;
 	while (curr->next)
 		curr = curr->next;
 	curr->next = new_node;
 }
 
-int ascending(int a, int b)
+void deallocate(t_list** root)
 {
-	return a <= b;
-}
+	t_list* curr = *root;
 
-void list_sort(t_type** root, int (*cmp)(int, int))
-{
-    /*do this part*/
-}
-
-int main(int argc, char const *argv[])
-{
-	t_type *root = NULL;
-
-	insert_end(&root, 1);
-	insert_end(&root, 3);
-	insert_end(&root, 2);
-	insert_end(&root, 5);
-
-	list_sort(&root, ascending);
-
-	t_type* curr = root;
 	while (curr)
 	{
-		printf("%d", curr->x);
+		t_list* aux = curr;
 		curr = curr->next;
-		if (curr)
-			printf(" ");
+		free(aux);
 	}
+	*root = NULL;
+}
 
+int ascending(int a, int b)
+{
+	return (a <= b);
+}
+
+void sort_list(t_list** root, int (*cmp)(int, int))
+{
+	int swapped = 1;
+	int temp;
+	t_list* curr = *root;
+
+	while (swapped)
+	{
+		curr = *root;
+		swapped = 0;
+
+		while (curr->next)
+		{
+			if (!(*cmp)(curr->x, curr->next->x))
+			{
+				temp = curr->x;
+				curr->x = curr->next->x;
+				curr->next->x = temp;
+				swapped = 1;
+			}
+			curr = curr->next;
+		}
+	}
+}
+
+int main()
+{
+	t_list* root = malloc(sizeof(t_list));
+	root->next = NULL;
+	root->x = 23;
+
+	insert_end(&root, -98);
+	insert_end(&root, 24);
+	insert_end(&root, 3);
+	insert_end(&root, 89);
+
+	sort_list(&root, ascending);
+
+	t_list* curr = root;
+	while (curr)
+	{
+		printf("%d\n", curr->x);
+		curr = curr->next;
+	}
+	deallocate(&root);
+	
 	return 0;
 }
